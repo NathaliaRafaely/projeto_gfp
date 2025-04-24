@@ -1,10 +1,10 @@
 import express from 'express';
 import { testarConexao } from './db.js';
 import cors from 'cors';
-import rotasUsuarios from './routes/rotasUsuarios.js';
+import rotasUsuarios, {autenticarToken} from './routes/rotasUsuarios.js';
 import rotasCategorias from './routes/rotasCategorias.js';
 import rotasSubCategorias from './routes/rotasSubCategorias.js';
-import rotaslocalTransacao from './routes/rotaslocalTransacao.js'
+// import rotaslocalTransacao from './routes/rotaslocalTransacao.js'
 
 const app = express();
 testarConexao();
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 //Rotas usuarios
 app.post('/usuarios', rotasUsuarios.novoUsuario)
 app.post('/usuarios/login', rotasUsuarios.login);
-app.get('/usuarios', rotasUsuarios.listar);
+app.get('/usuarios', autenticarToken, rotasUsuarios.listar);
 app.get('/usuarios/:id_usuario', rotasUsuarios.consultarPorId)
 app.patch('/usuarios/:id_usuario', rotasUsuarios.atualizar)
 app.put('/usuarios/:id_usuario', rotasUsuarios.atualizarTodosCampos)
@@ -41,13 +41,13 @@ app.patch('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizar)
 app.put('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizarTodosCampos)
 app.delete('/subcategorias/:id_subcategoria', rotasSubCategorias.desativar)
 
-// rotas local_transacao
-app.post('/localTransacao', rotaslocalTransacao.novolocalTransacao)
-app.get('/localTransacao', rotaslocalTransacao.listar)
-app.get('/localTransacao/:id_local_transacao', rotaslocalTransacao.consultarPorId)
-app.patch('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizar)
-app.put('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizarTodosCampos)
-app.delete('/localTransacao/:id_local_transacao', rotaslocalTransacao.desativar)
+// // rotas local_transacao
+// app.post('/localTransacao', rotaslocalTransacao.novolocalTransacao)
+// app.get('/localTransacao', rotaslocalTransacao.listar)
+// app.get('/localTransacao/:id_local_transacao', rotaslocalTransacao.consultarPorId)
+// app.patch('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizar)
+// app.put('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizarTodosCampos)
+// app.delete('/localTransacao/:id_local_transacao', rotaslocalTransacao.desativar)
 
 const porta = 3000;
 app.listen(porta, () => {
