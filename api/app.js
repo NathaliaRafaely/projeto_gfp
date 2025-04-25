@@ -23,23 +23,23 @@ app.get('/usuarios', autenticarToken, rotasUsuarios.listar);
 app.get('/usuarios/:id_usuario', rotasUsuarios.consultarPorId)
 app.patch('/usuarios/:id_usuario', rotasUsuarios.atualizar)
 app.put('/usuarios/:id_usuario', rotasUsuarios.atualizarTodosCampos)
-app.delete('/usarios/:id_usuario', rotasUsuarios.desativar)
+app.delete('/usuarios/:id_usuario', autenticarToken, rotasUsuarios.desativar)
 
 //Rotas categorias
-app.post('/categorias', rotasCategorias.novaCategoria)
-app.get('/categorias', rotasCategorias.listar)
-app.get('/categorias/:id_categoria', rotasCategorias.consultarPorId)
+app.post('/categorias',autenticarToken, rotasCategorias.novaCategoria)
+app.get('/categorias',autenticarToken, rotasCategorias.listar)
+app.get('/categorias/:id_categoria',autenticarToken, rotasCategorias.consultarPorId)
 app.patch('/categorias/:id_categoria', rotasCategorias.atualizar)
-app.put('/categorias/:id_categoria', rotasCategorias.atualizarTodosCampos)
+// app.put('/categorias/:id_categoria', rotasCategorias.atualizarTodosCampos)
 app.delete('/categorias/:id_categoria', rotasCategorias.desativar)
 
-//rotas subcategorias
-app.post('/subCategorias', rotasSubCategorias.novaSubCategoria)
-app.get('/subCategorias', rotasSubCategorias.listar)
-app.get('/subCategorias/:id_subcategoria', rotasSubCategorias.consultarPorId)
-app.patch('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizar)
-app.put('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizarTodosCampos)
-app.delete('/subcategorias/:id_subcategoria', rotasSubCategorias.desativar)
+// //rotas subcategorias
+// app.post('/subCategorias', rotasSubCategorias.novaSubCategoria)
+// app.get('/subCategorias', rotasSubCategorias.listar)
+// app.get('/subCategorias/:id_subcategoria', rotasSubCategorias.consultarPorId)
+// app.patch('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizar)
+// app.put('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizarTodosCampos)
+// app.delete('/subcategorias/:id_subcategoria', rotasSubCategorias.desativar)
 
 // // rotas local_transacao
 // app.post('/localTransacao', rotaslocalTransacao.novolocalTransacao)

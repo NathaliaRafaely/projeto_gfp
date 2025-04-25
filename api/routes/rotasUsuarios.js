@@ -44,7 +44,7 @@ class rotasUsuarios{
                 //payload
                 {id: usuario.id_usuario, nome: usuario.nome, email: usuario.email},
                 SECRET_KEY,
-                {expiresIn: '1h'}
+                // {expiresIn: '1h'}
             )
             return res.status(200).json({token, 
                 id_usuario: usuario.id_usuario, 
@@ -99,7 +99,9 @@ class rotasUsuarios{
             }
             if(senha !== undefined){
                 campos.push(`senha = $${valores.length + 1}`)
-                valores.push(senha);
+                const saltRounds = 10;
+                const senhaCriptografada = await bcrypt.hash(senha, saltRounds)
+                valores.push(senhaCriptografada);
             }
             if(tipo_acesso !== undefined){
                 campos.push(`tipo_acesso = $${valores.length + 1}`)
@@ -144,12 +146,11 @@ class rotasUsuarios{
    static async desativar(req, res){
     const { id_usuario } = req.params;
     try {
-      const usuario = await db.query(
-        'UPDATE usuarios SET ativo = FALSE WHERE id_usuario = $1 RETURNING *',
-        [id_usuario]);
-      res.json({ mensagem: 'Usuário desativado com sucesso.', usuario: usuario.rows[0] });
-    } catch (erro) {
-      res.status(500).json({ erro: 'Erro ao desativar o usuário.' });
+      const usuario = await BD.query(
+        'UPDATE usuarios SET ativo = false WHERE id_usuario = $1', [id_usuario]);
+      return res.status(200).json({ mensagem: 'Usuário desativado com sucesso ✔'});
+    } catch (error) {
+      res.status(500).json({mensagem: 'Erro ao desativar o usuário ❌', error: error.message});
     }
   };
 }
