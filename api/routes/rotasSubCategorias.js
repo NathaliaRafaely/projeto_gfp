@@ -124,4 +124,4 @@ class subCategoria {
             }
           };
 }
-export default subCategoria
+export default subCategoria;

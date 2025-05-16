@@ -3,8 +3,7 @@ import { testarConexao } from './db.js';
 import cors from 'cors';
 import rotasUsuarios, {autenticarToken} from './routes/rotasUsuarios.js';
 import rotasCategorias from './routes/rotasCategorias.js';
-import rotasSubCategorias from './routes/rotasSubCategorias.js';
-// import rotaslocalTransacao from './routes/rotaslocalTransacao.js'
+import rotasContas from './routes/rotasContas.js'
 
 const app = express();
 testarConexao();
@@ -41,13 +40,13 @@ app.delete('/categorias/:id_categoria', rotasCategorias.desativar)
 // app.put('/subcategorias/:id_subcategoria', rotasSubCategorias.atualizarTodosCampos)
 // app.delete('/subcategorias/:id_subcategoria', rotasSubCategorias.desativar)
 
-// // rotas local_transacao
-// app.post('/localTransacao', rotaslocalTransacao.novolocalTransacao)
-// app.get('/localTransacao', rotaslocalTransacao.listar)
-// app.get('/localTransacao/:id_local_transacao', rotaslocalTransacao.consultarPorId)
-// app.patch('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizar)
-// app.put('/localTransacao/:id_local_transacao', rotaslocalTransacao.atualizarTodosCampos)
-// app.delete('/localTransacao/:id_local_transacao', rotaslocalTransacao.desativar)
+// rotas Conta
+app.post('/conta', rotasContas.novaconta)
+app.get('/conta', rotasContas.listar)
+app.get('/conta/:id_conta', rotasContas.consultarPorId)
+app.patch('/conta/:id_conta', rotasContas.atualizar)
+// app.put('/conta/:id_conta', rotasContas.atualizarTodosCampos)
+// app.delete('/conta/:id_conta', rotasContas.desativar)
 
 const porta = 3000;
 app.listen(porta, () => {
