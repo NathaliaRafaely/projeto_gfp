@@ -5,6 +5,9 @@ export const corFundo = '#dee8f2'
 export const corFundo2 = '#bcc3d3'
 
 const Estilos = {
+  // fundo: {
+  //   backgroundColor: corPrincipal,
+  // },
     divLogin: {
         width: '350px',
         margin: '100px auto',

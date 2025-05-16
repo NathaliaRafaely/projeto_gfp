@@ -85,6 +85,24 @@ class rotasContas{
                 'Erro ao atualizar as sub conta', error: error.message})
         }
     }
+    static async filtrarNome(req, res){
+        const { nome } = req.query;
+
+        try{
+         const query = `
+         SELECT * FROM categorias
+         WHERE nome LIKE $1 AND ativo = true
+         ORDER BY nome DESC`
+
+         const valores = [`%${nome}%`]
+         const resposta = await BD.query(query, valores)
+         return res.status(200).json(resposta.rows)
+        }catch(error){
+         console.error('Error ao filtrar', error)
+         res.status(500).json({ erro: 'Erro ao filtar', error: error.message });
+         }
+        }
+     
 
 }
 export default rotasContas;

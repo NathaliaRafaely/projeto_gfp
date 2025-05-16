@@ -122,8 +122,10 @@ class rotasCategorias{
             const resposta = await BD.query(query, tipo_transacao)
             return res.status(200).json(resposta.rows)
            }catch(error){
-
+            console.error('Error ao filtrar categoria', error)
+            res.status(500).json({ erro: 'Erro ao filtar a categoria.', error: error.message });
+            }
            }
-          }
+        
 }
 export default rotasCategorias

@@ -1,5 +1,5 @@
 import { useNavigate, Link, Navigate } from "react-router-dom";
-import {useState, Router} from "react";
+import React, {useState, Router} from "react";
 import Estilos from "../styles/Estilos";
 import { enderecoServidor } from "../utils";
 
@@ -8,6 +8,7 @@ export default function Login() {
     
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
+    const [lembrar, setLembrar] = useState(false);
 
 
     async function botaoEntrar() {
@@ -29,7 +30,7 @@ export default function Login() {
                 if(resposta.ok){
                     const dados = await resposta.json();
                     setMensagem(`login bem-sucedido! ✅`)
-                    localStorage.setItem('UsuarioLogado', JSON.stringify(dados));
+                    localStorage.setItem('UsuarioLogado', JSON.stringify(...dados, lembrar));
                     navigate("/principal")
                 }else{
                     setMensagem('Email ou senha incorretos ❌');
@@ -47,7 +48,29 @@ export default function Login() {
             setSenha('');
         }
     
+        useEffect(() => {
+          const buscarUsuarioLogado = async () => {
+              const usuarioLogado = await localStorage.getItem('UsuarioLogado');
+              if (usuarioLogado){
+                  SetUsuario = (JSON.parse(usuarioLogado));
+              }else {
+                navigate('/');
+              }
+          };
+
+          buscarUsuarioLogado();
+      }, [])
+      
+      const botaoLogout = () => {
+        try{
+          localStorage.removeItem('UsuarioLogado')
+          navigate('/');
+        }catch(error){
+          console.error('Error ao deslegar:', error)
+        }
+      }
     return (
+<div style={Estilos.fundo}>
   <div className="card" style={Estilos.divLogin}>
     <h1 style={Estilos.textoPrincipal}>Tela de Login</h1>
 
@@ -65,10 +88,20 @@ export default function Login() {
       />
     </div>
 
+    <div className={StyleSheet.between}>
+      <div style={{display: flex, alignItems: 'center'}}>
+      <input type="checkbox" style={{marginRight: '5px'}} checked={lembrar} onChange={(e) => setLembrar(e.target.checked)}/>
+      <label>Lembrar-me</label>
+      </div>
+    </div>
+
+    <a href="#" className={StyleSheet.forgotPassword}>Esqueceu a senha?</a>
+
     <div style={Estilos.botoes}>
       <button onClick={botaoEntrar} type="button" style={Estilos.botao}>Entrar</button>
       <button onClick={botaoLimpar} type="button" style={{...Estilos.botao, ...Estilos.botaoLimpar}}>Limpar</button>
     </div>
   </div>
+</div>
 );
 }
