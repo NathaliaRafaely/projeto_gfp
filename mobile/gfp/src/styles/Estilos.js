@@ -148,6 +148,18 @@ const Estilos = StyleSheet.create({
         overflow: 'hidden',
         marginBottom: 24,
     },
+    botao1: {
+        width: 55,
+        height: 20,
+        borderColor: corPrincipal,
+        borderRadius: 5,
+        overflow: 'hidden',
+        marginBottom: 20,
+        backgroundColor: corPrincipal,
+        color: '#fff',
+        marginRight: 15,
+        marginTop: 15
+    },
     degradeBotao: {
         width: '100%',
         height: '100%',
@@ -160,9 +172,9 @@ const Estilos = StyleSheet.create({
         fontWeight: 'bold',
     }, 
     
-    conteudoHearder: {
+    conteudoHeader: {
         flex: 1,
-        backgroundColor: corSecundaria,
+        backgroundColor: corPrincipal,
     }, 
     
     conteudoCorpo: {
@@ -196,6 +208,15 @@ const Estilos = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: corSecundaria,
+    },
+    inputCad:{
+        marginTop: 5,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius:5,
+        padding: 10,
+        backgroundColor: '#fff'
     }
 
 });

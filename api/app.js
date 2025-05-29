@@ -7,14 +7,19 @@ import rotasSubCategorias from './routes/rotasSubCategorias.js';
 import rotasContas from './routes/rotasContas.js'
 import rotasTransacaos from './routes/rotasTransacao.js'
 
+import swaggerUI from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
+
 const app = express();
 testarConexao();
 
 app.use(cors())
 app.use(express.json())
 
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
+
 app.get('/', (req, res) => {
-    res.send('API Funcionando!!✔🎇')
+    res.redirect('/api-docs')
 })
 
 //Rotas usuarios
@@ -27,7 +32,7 @@ app.put('/usuarios/:id_usuario', autenticarToken, rotasUsuarios.atualizarTodosCa
 app.delete('/usuarios/:id_usuario', autenticarToken, rotasUsuarios.desativar)
 
 //Rotas categorias
-app.post('/categorias',autenticarToken, rotasCategorias.novaCategoria)
+app.post('/categorias', autenticarToken, rotasCategorias.novaCategoria)
 app.get('/categorias/filtrarCategoria',rotasCategorias.filtrarCategoria)
 app.get('/categorias',autenticarToken, rotasCategorias.listar)
 // app.get('/categorias/:id_categoria',autenticarToken, rotasCategorias.consultarPorId)
@@ -44,13 +49,13 @@ app.get('/subCategorias', rotasSubCategorias.listar)
 // app.delete('/subcategorias/:id_subcategoria', rotasSubCategorias.desativar)
 
 // rotas Conta
-app.post('/conta', autenticarToken, rotasContas.novaconta)
-app.get('/conta/filtrarNome',rotasContas.filtrarNome)
-app.get('/conta',autenticarToken, rotasContas.listar)
-app.get('/conta/:id_conta', rotasContas.consultarPorId)
-app.patch('/conta/:id_conta', rotasContas.atualizar)
-// app.put('/conta/:id_conta', rotasContas.atualizarTodosCampos)
-// app.delete('/conta/:id_conta', rotasContas.desativar)
+app.post('/contas', rotasContas.novaconta)
+app.get('/contas/filtrarNome',rotasContas.filtrarNome)
+app.get('/contas', rotasContas.listar)
+app.get('/contas/:id_conta', rotasContas.consultarPorId)
+app.patch('/contas/:id_conta', rotasContas.atualizar)
+app.put('/contas/:id_conta', rotasContas.atualizar)
+// app.delete('/contas/:id_conta', rotasContas.desativar)
 
 // rotas transacao
 app.post('/transacao', rotasTransacaos.novaTransacao)

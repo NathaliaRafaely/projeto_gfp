@@ -2,13 +2,13 @@ import { BD } from "../db.js";
 
 class rotasContas{
     static async novaconta(req, res){
-        const{nome, tipo_conta, saldo}= req.body;
+        const{nome, tipo_conta, saldo, conta_padrao}= req.body;
 
         try{
             const conta = await BD.query(`
-                INSERT INTO contas(nome, tipo_conta, saldo)
-                VALUES($1, $2, $3)`,
-            [nome, tipo_conta, saldo])
+                INSERT INTO contas(nome, tipo_conta, saldo, conta_padrao)
+                VALUES($1, $2, $3, $4)`,
+            [nome, tipo_conta, saldo, conta_padrao])
 
             res.status(201).json("Conta Cadastrada com sucesso✔")
         }catch(error){
@@ -41,7 +41,7 @@ class rotasContas{
 
     static async atualizar(req, res){
         const {id_conta} = req.params;
-        const {nome, tipo_conta, saldo} = req.body;
+        const {nome, tipo_conta, saldo, conta_padrao} = req.body;
 
         try{
              const campos = [];
@@ -60,6 +60,10 @@ class rotasContas{
                 campos.push(`saldo = $${valores.length + 1}`)
                 valores.push(saldo);
             }
+            if(conta_padrao !== undefined){
+                campos.push(`conta_padrao = $${valores.length + 1}`)
+                valores.push(conta_padrao);
+            }
             if(campos.length === 0){
                 return res.status(400).json({message: 'Nenhum campo fornecido para atualizar'})
             }
@@ -70,7 +74,8 @@ class rotasContas{
             //Montamos a query dinamicamente
             const query = 
             `UPDATE contas SET ${campos.join(', ')} 
-            WHERE id_conta = ${id_conta} RETURNING *`
+            WHERE id_conta = $${valores.length} RETURNING *`
+
 
             //Executando nossa query
             const conta = await BD.query(query,valores)
