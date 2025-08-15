@@ -36,7 +36,7 @@ export default function Contas() {
             <section className='bg-white p-4 rounded-lg shadow-md'>
                 <div className="flex justify-between items-center mb-4">
                     <h3 className='text-xl font-bold text-gray-800'>Gerenciar Contas</h3>
-                    <button>
+                    <button className="">
                         <MdAdd className="h-8 w-8"/>
                     </button>
                 </div>
