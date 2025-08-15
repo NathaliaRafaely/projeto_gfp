@@ -1,15 +1,14 @@
 import {BD} from '../db.js'
 
-
 class rotasCategorias{
         static async novaCategoria(req, res){
-            const{nome, tipo_transacao, gasto_fixo, id_usuario}= req.body;
+            const{nome, tipo_transacao, gasto_fixo, id_usuario, icone, cor}= req.body;
 
             try{
                 const categoria = await BD.query(`
-                    INSERT INTO categorias(nome, tipo_transacao, gasto_fixo, id_usuario)
-                    VALUES($1, $2, $3, $4) RETURNING *`,
-                [nome, tipo_transacao, gasto_fixo, id_usuario])
+                    INSERT INTO categorias(nome, tipo_transacao, gasto_fixo, id_usuario, icone, cor)
+                    VALUES($1, $2, $3, $4, $5, $6) RETURNING *`,
+                [nome, tipo_transacao, gasto_fixo, id_usuario, icone, cor])
     
                 res.status(201).json("Categoria Cadastrada com sucesso✔")
             }catch(error){
@@ -20,7 +19,7 @@ class rotasCategorias{
 
         static async listar(req, res){
             try{
-                const categorias = await BD.query('SELECT * FROM categorias');
+                const categorias = await BD.query('SELECT * FROM categorias where ativo = true');
                 res.status(200).json(categorias.rows);
             }catch(error){
                 res.status(500).json({message:
@@ -94,19 +93,19 @@ class rotasCategorias{
                     'Erro ao atualizar as categorias', error: error.message})
             }
     
-        }
+        };
 
-        static async desativar(req, res){
-            const { id_categoria } = req.params;
-            try {
-              const categoria = await db.query(
-                'UPDATE categorias SET ativo = FALSE WHERE id_categoria = $1 RETURNING *',
+        static async desativar(req, res) {
+        const { id_categoria } = req.params;
+        try {
+            const categoria = await BD.query(
+                'UPDATE categorias SET ativo = false WHERE id_categoria = $1 RETURNING *',
                 [id_categoria]);
-              res.json({ mensagem: 'Categoria desativado com sucesso.', categoria: categoria.rows[0] });
-            } catch (erro) {
-              res.status(500).json({ erro: 'Erro ao desativar a categoria.' });
-            }
-          };
+            res.json({ mensagem: 'Categoria desativada com sucesso.', categoria: categoria.rows[0] });
+        } catch (erro) {
+            res.status(500).json({ erro: 'Erro ao desativar a categoria.' });
+        }
+    };
 
           //Filtrar por tipo de categoria
           static async filtrarCategoria(req, res){

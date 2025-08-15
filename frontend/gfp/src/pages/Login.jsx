@@ -1,107 +1,155 @@
-import { useNavigate, Link, Navigate } from "react-router-dom";
-import React, {useState, Router} from "react";
-import Estilos from "../styles/Estilos";
-import { enderecoServidor } from "../utils";
+import React, { useState, useContext, useEffect } from 'react';
+import { UsuarioContext } from '../UsuarioContext'
+import styles from './Login.module.css';
+import logo from "../assets/logo.png"
+import { enderecoServidor } from '../utils'
+import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
-    const navigate = useNavigate();
-    
-    const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
-    const [lembrar, setLembrar] = useState(false);
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdBarChart, MdNotifications, MdTrendingUp } from 'react-icons/md';
+
+function Login() {
+	const { dadosUsuario, setDadosUsuario} = useContext(UsuarioContext);
+
+	const [email, setEmail] = useState('');
+	const [senha, setSenha] = useState('');
+	const [showPassword, setShowPassword] = useState(false);
+	const [lembrar, setLembrar] = useState(false);
+
+	const navigate = useNavigate();
+
+	const botaoLogin = async (e) => {
+		e.preventDefault();
+		try {
+			if (email === '' || senha === '') {
+				throw new Error('Preencha todos os campos');
+			}
+			//autenticando utilizando a API de backend com o fetch e recebendo o token
+			const resposta = await fetch(`${enderecoServidor}/usuarios/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					email: email,
+					senha: senha,
+				}),
+			});
+
+			const dados = await resposta.json();
+			if (resposta.ok) {
+				localStorage.setItem('UsuarioLogado', JSON.stringify({ ...dados, lembrar }));
+				setDadosUsuario(dados); //Gravando os dados do usuário no contexto
+				navigate("/principal")
+			} else {
+				throw new Error(dados.message || 'Erro ao fazer login');
+			}
+		} catch (error) {
+			console.error('Erro ao realizar login:', error);
+			alert(error.message);
+			return;
+		}
+	};
 
 
-    async function botaoEntrar() {
-       try{
-          if(email == '' || senha == ''){
-          throw new Error ('Preencha todos os campos')}
-          //Autenticar utilizando a API de backend com o fetch
-          const resposta = await fetch(`${enderecoServidor}/usuarios/login`,
-              {
-                  method: 'POST',
-                  headers: {'Content-Type': 'applicantion/json'},
-                  body: JSON.stringify({
-                  email: email,
-                  senha: senha
-                  })
-              }
-              )
-                
-                if(resposta.ok){
-                    const dados = await resposta.json();
-                    setMensagem(`login bem-sucedido! ✅`)
-                    localStorage.setItem('UsuarioLogado', JSON.stringify(...dados, lembrar));
-                    navigate("/principal")
-                }else{
-                    setMensagem('Email ou senha incorretos ❌');
-                    throw new Error('Email ou senha incorretos ❌')
+
+	const togglePasswordVisibility = () => {
+		setShowPassword(!showPassword);
+	};
+
+	useEffect(() => {
+        const buscarUsuarioLogado = async () => {
+            const usuarioLogado = await localStorage.getItem('UsuarioLogado');
+            if (usuarioLogado){
+                const usuario = JSON.parse(usuarioLogado);
+                if (usuario.lembrar == true){
+					setDadosUsuario(dados);
+                    navigate('/principal')
                 }
-            } catch (error) {
-                console.error('Error ao realizar login:', error)
-                alert(error.mensage);
-                return;
-            }
-            
+            }    
         }
-        function botaoLimpar(){
-            setEmail('');
-            setSenha('');
-        }
-    
-        useEffect(() => {
-          const buscarUsuarioLogado = async () => {
-              const usuarioLogado = await localStorage.getItem('UsuarioLogado');
-              if (usuarioLogado){
-                  SetUsuario = (JSON.parse(usuarioLogado));
-              }else {
-                navigate('/');
-              }
-          };
+        buscarUsuarioLogado()
+    }, [])
 
-          buscarUsuarioLogado();
-      }, [])
-      
-      const botaoLogout = () => {
-        try{
-          localStorage.removeItem('UsuarioLogado')
-          navigate('/');
-        }catch(error){
-          console.error('Error ao deslegar:', error)
-        }
-      }
-    return (
-<div style={Estilos.fundo}>
-  <div className="card" style={Estilos.divLogin}>
-    <h1 style={Estilos.textoPrincipal}>Tela de Login</h1>
+	return (
+		<div className={styles.container}>
+			<header className={styles.header}>
+				{/* Using MdTrendingUp as a placeholder for the logo */}
 
-    <div style={Estilos.campo}>
-      <label htmlFor="email" style={Estilos.label}>Digite seu Email:</label>
-      <input id="email" type="email" placeholder="name@example.com" value={email}
-        onChange={(e) => setEmail(e.target.value)} style={Estilos.input} />
-    </div>
+				<img src={logo} alt="Logo" className={styles.logoIcon} style={{ width: '50px', height: '50px' }} />
+				<div>
+					<h1 className={styles.appName}>GFP</h1>
+					<p className={styles.appSubtitle}>Gestor Financeiro Pessoal</p>
+				</div>
+			</header>
 
-    <div style={Estilos.campo}>
-      <label htmlFor="senha" style={Estilos.label}>Digite sua Senha:</label>
-      <input
-        id="senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} 
-        style={Estilos.input} aria-describedby="passwordHelpBlock"
-      />
-    </div>
+			<main className={styles.mainContent}>
+				<div className={styles.loginForm}>
+					<h2 className={styles.title}>Acesse sua conta</h2>
 
-    <div className={StyleSheet.between}>
-      <div style={{display: flex, alignItems: 'center'}}>
-      <input type="checkbox" style={{marginRight: '5px'}} checked={lembrar} onChange={(e) => setLembrar(e.target.checked)}/>
-      <label>Lembrar-me</label>
-      </div>
-    </div>
+					<div className={styles.inputGroup}>
+						<MdEmail className={styles.inputIcon} />
+						<input
+							type="email"
+							placeholder="Email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							className={styles.input}
+							aria-label="Email"
+						/>
+					</div>
 
-    <a href="#" className={StyleSheet.forgotPassword}>Esqueceu a senha?</a>
+					<div className={styles.inputGroup}>
+						<MdLock className={styles.inputIcon} />
+						<input
+							type={showPassword ? 'text' : 'password'}
+							placeholder="Senha"
+							value={senha}
+							onChange={(e) => setSenha(e.target.value)}
+							className={styles.input}
+							aria-label="Senha"
+						/>
+						<button
+							type="button"
+							onClick={togglePasswordVisibility}
+							className={styles.visibilityToggle}
+							aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+						>
+							{showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+						</button>
+					</div>
 
-    <div style={Estilos.botoes}>
-      <button onClick={botaoEntrar} type="button" style={Estilos.botao}>Entrar</button>
-      <button onClick={botaoLimpar} type="button" style={{...Estilos.botao, ...Estilos.botaoLimpar}}>Limpar</button>
-    </div>
-  </div>
-</div>
-);
+					<div className={styles.between}>
+						<div style={{ display: 'flex', alignItems: 'center' }}>
+							<input type="checkbox" style={{ marginRight: '5px' }} 
+								checked={lembrar} onChange={(e) => setLembrar(e.target.checked)}/>
+							<label > Lembrar-me</label>
+						</div>
+						<a href="#" className={styles.forgotPassword}>Esqueceu a senha?</a>
+
+					</div>
+
+					<button type="submit" className={styles.submitButton} onClick={botaoLogin}>
+						Entrar
+					</button>
+
+					<p className={styles.signupText}>
+						Não tem uma conta? <a href="#" className={styles.signupLink}>Cadastre-se</a>
+					</p>
+				</div>
+
+				<div className={styles.infoBoxes}>
+					<div className={styles.infoBox}>
+						<MdBarChart className={styles.infoIcon} />
+						<span>Acompanhe seus gastos com gráficos</span>
+					</div>
+					<div className={styles.infoBox}>
+						<MdNotifications className={styles.infoIcon} />
+						<span>Receba alertas financeiros importantes</span>
+					</div>
+				</div>
+			</main>
+		</div>
+	);
 }
+
+export default Login;

@@ -21,8 +21,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login}/>
         <Stack.Screen name="MenuDrawer" component={MenuDrawer} options={{ headerShown: false }}/>
         <Stack.Screen name="Principal" component={Principal} options={{ headerShown: false }}/>
-        <Stack.Screen name="CadContas" component={CadContas}
-        options={{title: 'Cadastro de Contas'}}/>
+        <Stack.Screen name="CadContas" component={CadContas} options={{title: 'Cadastro de Contas'}}/>
       </Stack.Navigator>
     </NavigationContainer>
   )

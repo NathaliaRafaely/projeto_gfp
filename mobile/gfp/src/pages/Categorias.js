@@ -1,14 +1,24 @@
 import React, { useState, useEffect, useLayoutEffect} from 'react';
-import  {View, Text, FlatList, Image, TouchableOpacity, RefreshControl} from 'react-native';
+import  {View, Text, FlatList, Image, TouchableOpacity, RefreshControl, Modal, Button} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Estilos, { corPrincipal } from '../styles/Estilos';
-import {enderecoServidor} from '../utils';
+import {enderecoServidor, listaCores, listaIcones} from '../utils';
+import { TextInput } from 'react-native-gesture-handler';
 
 export default function Categorias({navigation}) {
     const [dadosLista, setDadosLista] = useState([]);
     const [usuario, setUsuario] = useState({});
     const [atualizando, setAtualizando] = useState(false);
+
+    const [modalVisible, setModalVisible] = useState(false)
+    const [nomeCategoria, setNomeCategoria] = useState('')
+    const [categoriaSelecionada, setCategoriaSelecionada] = useState(null)
+
+    const [corModalVisible, setCorModalVisible] = useState(false);
+    const [iconeModalVisible, setIconeModalVisible] = useState(false);
+    const [cor, setCor] = useState('#ff80aa');
+    const [icone, setIcone] = useState('wallet')
 
     const buscarDadosAPI = async () => {
         try {
@@ -19,6 +29,8 @@ export default function Categorias({navigation}) {
                 }
             });
             const dados = await resposta.json();
+        console.log(dados);
+        
             setDadosLista(dados);            
         } catch (error) {
             console.error('Erro ao buscar dados:', error);
@@ -43,6 +55,14 @@ export default function Categorias({navigation}) {
         }
     }
 
+    const botaoEditar = (item) => {
+        setCategoriaSelecionada(item);
+        setNomeCategoria(item.nome);
+        setCor(item.cor);
+        setIcone(item.ico)
+        setModalVisible(true);
+    }
+
     const botaoExcluir = async (id) => {
         try {
             const resposta = await fetch(`${enderecoServidor}/categorias/${id}`, {
@@ -50,7 +70,9 @@ export default function Categorias({navigation}) {
                 headers: {
                     'Authorization': `Bearer ${usuario.token}`
                 }
+                
             });
+             console.log(resposta)
 
             if (resposta.ok) {
                 buscarDadosAPI();
@@ -79,7 +101,7 @@ export default function Categorias({navigation}) {
                     <Text>0,00</Text>
                 </View>
                 <MaterialIcons name='edit' size={24} color={corPrincipal} 
-                    
+                    onPress={() => botaoEditar(item)}
                 />
                 <MaterialIcons name='delete' size={24} color={corPrincipal} 
                     onPress={() => botaoExcluir(item.id_categoria)}
@@ -93,11 +115,58 @@ export default function Categorias({navigation}) {
             headerRight: () => (
                 <TouchableOpacity >
                     <MaterialIcons name="add" size={28} color="#fff"  
-                        style={{marginRight: 15}} />                    
+                        style={{marginRight: 15}} 
+                        onPress={() => setModalVisible(true)} />                    
                 </TouchableOpacity>
             )
         })
     }, [navigation])
+
+    const botaoSalvar = async () => {
+        try{
+            const dados = { 
+                nome: nomeCategoria,
+                tipo_transacao: 'SAIDA',
+                id_usuario: usuario.id_usuario,
+                icone: icone,
+                cor: cor
+            }
+            let endpoint = `${enderecoServidor}/categorias`;
+            let metodo = 'POST';
+
+            if (categoriaSelecionada) {
+                endpoint = `${enderecoServidor}/categorias/${categoriaSelecionada.id_categoria}`;
+                metodo = 'PUT'
+            }
+
+            const resposta = await fetch(endpoint, {
+            method: metodo,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${usuario.token}`
+            },
+            body: JSON.stringify(dados)
+        });
+
+        if (resposta.ok) {
+            alert('Categoria salva com sucesso!!');
+            setModalVisible(false);
+            setNomeCategoria('')
+            buscarDadosAPI();
+            setCategoriaSelecionada(null);
+        }
+
+        }catch(error) {
+            alert('Erro ao salvar categoria: ' + error)
+            console.error('Erro ao salvar categoria: ', error)
+        }
+    }
+
+    const botaoCancelar = () =>{
+            setModalVisible(false);
+            setNomeCategoria('')
+            setCategoriaSelecionada(null);
+    }   
 
     return (
         <View style={Estilos.conteudoHeader}>
@@ -111,6 +180,79 @@ export default function Categorias({navigation}) {
                     }
                 />
             </View>
+            <Modal visible={modalVisible} transparent={true} animationType='slide' onRequestClose={() => setModalVisible(false)} >
+                <View style={Estilos.modalFundo}>
+                    <View style={Estilos.modalConteudo}>
+                        <Text style={Estilos.modalTitulo}>Categoria</Text>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <TextInput style={Estilos.inputModal} 
+                            placeholder='Nome de categoria'
+                            placeholderTextColor={'#aaa'}
+                            value={nomeCategoria}
+                            onChangeText={setNomeCategoria} 
+                            />
+                            <TouchableOpacity style={[Estilos.corBotao, {backgroundColor: cor}]} onPress={() => setCorModalVisible(true)}/>
+                            <TouchableOpacity style={Estilos.iconeBotao} onPress={() => setIconeModalVisible(true)}>
+                                <MaterialIcons name={icone} size={24} color={'#fff'}/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={Estilos.modalBotoes}>
+                            <Button title='Cancelar' onPress={botaoCancelar}/>
+                            <Button title='Salvar' onPress={botaoSalvar}/>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                visible={corModalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setCorModalVisible(false)}>
+                <View style={Estilos.modalFundo}>
+                    <View style={Estilos.SeletorContainer}>
+                        <Text style={Estilos.modalTitulo}>Escolha uma cor</Text>
+                        <View style={Estilos.listaModal}>
+                            {listaCores.map((corItem) => (
+                                <TouchableOpacity
+                                    key={corItem}
+                                    style={[Estilos.corBotao, { backgroundColor: corItem }]}
+                                    onPress={() => {
+                                        setCor(corItem);
+                                        setCorModalVisible(false);
+                                    }}
+                                />
+                            ))}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal de seleção de ícone */}
+            <Modal
+                visible={iconeModalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setIconeModalVisible(false)}>
+
+                <View style={Estilos.modalFundo}>
+                    <View style={Estilos.SeletorContainer}>
+                        <Text style={Estilos.modalTitulo}>Escolha um ícone</Text>
+                        <View style={Estilos.listaModal}>
+                            {listaIcones.map((iconeItem) => (
+                                <TouchableOpacity
+                                    key={iconeItem}
+                                    style={Estilos.iconeBotao}
+                                    onPress={() => {
+                                        setIcone(iconeItem);
+                                        setIconeModalVisible(false);
+                                    }}>
+                                    <MaterialIcons name={iconeItem} size={24} color="#FFF" />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     )
 }

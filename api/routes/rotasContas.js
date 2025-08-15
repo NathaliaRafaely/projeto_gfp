@@ -19,7 +19,7 @@ class rotasContas{
 
     static async listar(req, res){
         try{
-            const conta = await BD.query('SELECT * FROM contas');
+            const conta = await BD.query('SELECT * FROM contas where ativo = true');
             res.status(200).json(conta.rows);
         }catch(error){
             res.status(500).json({message:
@@ -107,6 +107,18 @@ class rotasContas{
          res.status(500).json({ erro: 'Erro ao filtar', error: error.message });
          }
         }
+
+        static async desativar(req, res) {
+        const { id_conta } = req.params;
+        try {
+            const conta = await BD.query(
+                'UPDATE contas SET ativo = false WHERE id_conta = $1 RETURNING *',
+                [id_conta]);
+            res.json({ mensagem: 'conta desativada com sucesso.', conta: conta.rows[0] });
+        } catch (erro) {
+            res.status(500).json({ erro: 'Erro ao desativar a conta.' });
+        }
+    };
      
 
 }

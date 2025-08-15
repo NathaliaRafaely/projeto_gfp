@@ -37,7 +37,7 @@ app.get('/categorias/filtrarCategoria',rotasCategorias.filtrarCategoria)
 app.get('/categorias',autenticarToken, rotasCategorias.listar)
 // app.get('/categorias/:id_categoria',autenticarToken, rotasCategorias.consultarPorId)
 // app.patch('/categorias/:id_categoria', rotasCategorias.atualizar)
-// app.put('/categorias/:id_categoria', rotasCategorias.atualizarTodosCampos)
+app.put('/categorias/:id_categoria', rotasCategorias.atualizarTodosCampos)
 app.delete('/categorias/:id_categoria', autenticarToken, rotasCategorias.desativar)
 
 // //rotas subcategorias
@@ -55,7 +55,7 @@ app.get('/contas', rotasContas.listar)
 app.get('/contas/:id_conta', rotasContas.consultarPorId)
 app.patch('/contas/:id_conta', rotasContas.atualizar)
 app.put('/contas/:id_conta', rotasContas.atualizar)
-// app.delete('/contas/:id_conta', rotasContas.desativar)
+app.delete('/contas/:id_conta', rotasContas.desativar)
 
 // rotas transacao
 app.post('/transacao', rotasTransacaos.novaTransacao)
