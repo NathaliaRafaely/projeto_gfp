@@ -3,6 +3,7 @@ import { UsuarioContext } from '../UsuarioContext'
 import { useNavigate, Link, Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Contas from './Contas';
+import CadConta from './CadContas';
 import logo from '../assets/logo.png'
 import { MdAdd, MdCached, MdClose, MdCreditCard, MdGridView, MdLogout,
     MdOutlineLocalOffer, MdPeople, MdMenu } from 'react-icons/md';
@@ -107,10 +108,10 @@ export default function Principal() {
                     </div>
                 </nav>
                 <div className='p-4 lg:p-6 border-t border-slate-700 bg-cyan-600
-                    hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-lg mb-4'>
+                    hover:bg-cyan-700 text-white font-bold py-3 px-2 rounded-lg mb-2'>
                        
                     <button className='flex w-full item-center justify-center'>
-                        <MdAdd className='w-8 h-8' />
+                        <MdAdd className='w-5 h-5' />
                         <span className='md:hidden lg:block'>Nova Transação</span>
                     </button>
                 </div>
@@ -146,6 +147,7 @@ export default function Principal() {
                         <Route path='/' element={<Dashboard />} />
                         <Route path='/dashboard' element={<Dashboard />} />
                         <Route path='/contas' element={<Contas />} />
+                        <Route path='/cadcontas' element={<CadConta />} />
                     </Routes>
                 </main>
 
