@@ -1,125 +1,123 @@
 import { BD } from "../db.js";
 
-class rotasContas{
-    static async novaconta(req, res){
-        const{nome, tipo_conta, saldo, conta_padrao}= req.body;
+class rotasContas {
+	static async novoConta(req, res) {
+		const { nome, tipo_conta, saldo, conta_padrao } = req.body;
+		
+		try {
+			const contas = await BD.query(`
+                INSERT INTO contas (nome, tipo_conta, saldo, conta_padrao) 
+                    VALUES ($1, $2, $3, $4) RETURNING *`,
+				[nome, tipo_conta, saldo, conta_padrao]
+			);
 
-        try{
-            const conta = await BD.query(`
-                INSERT INTO contas(nome, tipo_conta, saldo, conta_padrao)
-                VALUES($1, $2, $3, $4)`,
-            [nome, tipo_conta, saldo, conta_padrao])
+			res.status(201).json("Conta Cadastrada");
+		} catch (error) {
+			console.error("Erro ao criar conta:", error);
+			res.status(500).json({ message: "Erro ao criar conta", error: error.message });
+		}
+	}
 
-            res.status(201).json("Conta Cadastrada com sucesso✔")
-        }catch(error){
-            console.error('Erro ao criar conta', error);
-            res.status(500).json({message: 'Erro ao criar', error: error.message})
-        }
-    }
+	static async listarContas(req, res) {
+		try {
+			const contas = await BD.query("SELECT * FROM contas where ativo = true order by nome");
+			res.status(200).json(contas.rows);
+		} catch (error) {
+			console.error("Erro ao listar locais:", error);
+			res.status(500).json({ message: "Erro ao listar locais", error: error.message });
+		}
+	}
 
-    static async listar(req, res){
-        try{
-            const conta = await BD.query('SELECT * FROM contas where ativo = true');
-            res.status(200).json(conta.rows);
-        }catch(error){
-            res.status(500).json({message:
-                'Erro ao listar as conta', error: error.message})
-        }
-    }
+	static async deletarContas(req, res) {
+		const { id } = req.params;
+		try {
+			// Chama o metodo na classe usuario para deletar um usuario
+			const contas = await BD.query(
+				`UPDATE contas SET ativo = false WHERE id_conta = $1 `,
+				[id]
+			);
+			return res.status(200).json({ message: "Conta desativada com sucesso!" });
+		} catch (error) {
+			console.error("Erro ao desativar conta:", error);
+			res.status(500).json({ message: "Erro ao desativar conta", error: error.message });
+		}
+	}
 
-    static async consultarPorId(req, res){
-        const {id_conta} = req.params;
-        try{
-            const conta = await BD.query(
-                'SELECT * FROM contas WHERE id_conta = $1', [id_conta])
-            res.status(200).json(conta.rows[0])
-        }catch(error){
-            res.status(500).json({message:
-                'Erro ao consultar as conta', error: error.message})
-        }
-    }
+	static async consultaPorId(req, res) {
+		const { id } = req.params;
 
-    static async atualizar(req, res){
-        const {id_conta} = req.params;
-        const {nome, tipo_conta, saldo, conta_padrao} = req.body;
+		try {
+			const contas = await BD.query(
+				`SELECT * FROM contas WHERE id_conta = $1`,
+				[id]
+			);
+			return res.status(200).json(contas.rows[0]);
+		} catch (error) {
+			console.error("Erro ao consultar conta:", error);
+			res.status(500).json({ message: "Erro ao consultar conta", error: error.message });
+		}
+	}
 
-        try{
-             const campos = [];
-             const valores = [];
+	static async atualizarTodosCampos(req, res) {
+		const { id } = req.params;
+		const { nome, tipo_conta, saldo, conta_padrao } = req.body;
+		try {
+			const contas = await BD.query(
+				`UPDATE contas SET nome = $1, tipo_conta = $2, saldo = $3, conta_padrao = $4 WHERE id_conta = $5 RETURNING *`, // comando para atualizar o usuario
+				[nome, tipo_conta, saldo, conta_padrao, id] // comando para atualizar o usuario
+			)
+			return res.status(200).json(contas.rows[0]);
+		} catch (error) {
+			console.error("Erro ao atualizar conta:", error);
+			res.status(500).json({ message: "Erro ao atualizar conta", error: error.message });
+		}
+	}
 
-            //verificar quais campos foram fornecidos
-            if(nome !== undefined){
-                campos.push(`nome = $${valores.length + 1}`) //
-                valores.push(nome);
-            }
-            if(tipo_conta !== undefined){
-                campos.push(`tipo_conta = $${valores.length + 1}`)
-                valores.push(tipo_conta);
-            }
-            if(saldo !== undefined){
-                campos.push(`saldo = $${valores.length + 1}`)
-                valores.push(saldo);
-            }
-            if(conta_padrao !== undefined){
-                campos.push(`conta_padrao = $${valores.length + 1}`)
-                valores.push(conta_padrao);
-            }
-            if(campos.length === 0){
-                return res.status(400).json({message: 'Nenhum campo fornecido para atualizar'})
-            }
+	static async atualizar(req, res) {
+		const { id } = req.params;
+		const { nome, tipo_conta, saldo } = req.body;
+		try {
+			// Inicializar arrays(vetores) para armazenar os campos e valores que serão atualizados
+			const campos = [];
+			const valores = [];
 
-            //Adicionar o id ao final de valores
-            valores.push(id_conta)
+			// Verificar quais campos foram fornecidos
+			if (nome !== undefined) {
+				campos.push(`nome = $${valores.length + 1}`);
+				valores.push(nome);
+			}
+			if (tipo_conta !== undefined) {
+				campos.push(`tipo_conta = $${valores.length + 1}`);
+				valores.push(tipo_conta);
+			}
+			if (saldo !== undefined) {
+				campos.push(`saldo = $${valores.length + 1}`);
+				valores.push(saldo);
+			}
+			if (campos.length === 0) {
+				return res.status(400).json({ message: "Nenhum campo para atualizar foi fornecido." });
+			}
 
-            //Montamos a query dinamicamente
-            const query = 
-            `UPDATE contas SET ${campos.join(', ')} 
-            WHERE id_conta = $${valores.length} RETURNING *`
+			// adicionar o id ao final de valores
 
+			// montamos a query dinamicamente
+			const query = `UPDATE contas SET ${campos.join(", ")}  
+                          WHERE id_conta = ${id} RETURNING *`;
+			// Executando a query
+			const contas = await BD.query(query, valores);
 
-            //Executando nossa query
-            const conta = await BD.query(query,valores)
-            //Verifica se foi atualizando
-            if(conta.rows.length === 0){
-                return res.status(404).json({message: 'conta não encontrada'})
-            }
+			// Verifica se o uusario foi atualizado
+			if (contas.rows.length === 0) {
+				return res.status(404).json({ message: "Conta não encontrado" });
+			}
 
-            return res.status(200).json(conta.rows[0])
-        }catch(error){
-            res.status(500).json({message:
-                'Erro ao atualizar as sub conta', error: error.message})
-        }
-    }
-    static async filtrarNome(req, res){
-        const { nome } = req.query;
-
-        try{
-         const query = `
-         SELECT * FROM categorias
-         WHERE nome LIKE $1 AND ativo = true
-         ORDER BY nome DESC`
-
-         const valores = [`%${nome}%`]
-         const resposta = await BD.query(query, valores)
-         return res.status(200).json(resposta.rows)
-        }catch(error){
-         console.error('Error ao filtrar', error)
-         res.status(500).json({ erro: 'Erro ao filtar', error: error.message });
-         }
-        }
-
-        static async desativar(req, res) {
-        const { id_conta } = req.params;
-        try {
-            const conta = await BD.query(
-                'UPDATE contas SET ativo = false WHERE id_conta = $1 RETURNING *',
-                [id_conta]);
-            res.json({ mensagem: 'conta desativada com sucesso.', conta: conta.rows[0] });
-        } catch (erro) {
-            res.status(500).json({ erro: 'Erro ao desativar a conta.' });
-        }
-    };
-     
-
+			return res.status(200).json(contas.rows[0]);
+		} catch (error) {
+			console.error("Erro ao atualizar conta:", error);
+			res.status(500).json({ message: "Erro ao atualizar conta", error: error.message });
+		}
+	}
 }
+
+
 export default rotasContas;
