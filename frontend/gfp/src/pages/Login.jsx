@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { UsuarioContext } from '../UsuarioContext'
 import styles from './Login.module.css';
-import logo from "../assets/logo.png"
+import logo from '../assets/logo.png';
 import { enderecoServidor } from '../utils'
 import { useNavigate } from 'react-router-dom';
 
@@ -10,8 +10,8 @@ import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdBarChart, MdNotificat
 function Login() {
 	const { dadosUsuario, setDadosUsuario} = useContext(UsuarioContext);
 
-	const [email, setEmail] = useState('');
-	const [senha, setSenha] = useState('');
+	const [email, setEmail] = useState('sesi@sesi.br');
+	const [senha, setSenha] = useState('123');
 	const [showPassword, setShowPassword] = useState(false);
 	const [lembrar, setLembrar] = useState(false);
 

@@ -1,39 +1,34 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect} from 'react';
-import { Text, View, Button } from 'react-native';
-import Estilos from '../styles/Estilos';
+import React, { useState, useEffect } from "react";
+import { Text, View, Button } from "react-native-web";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Principal({ navigation }){
-
+export default function Principal({ navigation }) {
     const [usuario, setUsuario] = useState({});
-
     useEffect(() => {
         const buscarUsuarioLogado = async () => {
             const usuarioLogado = await AsyncStorage.getItem('UsuarioLogado');
             if (usuarioLogado) {
-                setUsuario(JSON.parse(usuarioLogado));
+                setUsuario(JSON.parse(usuarioLogado))
             } else {
-                navigation.navigate('Login');
+                navigation.navigate('Login')
             }
         }
-        buscarUsuarioLogado();
+        buscarUsuarioLogado()
     }, [])
+
 
     const botaoLogout = () => {
         AsyncStorage.removeItem('UsuarioLogado');
-        navigation.navigate('Login');
+        navigation.navigate('Login')
     }
     return(
         <View>
-            <View style={{flexDirection: 'row',
-                           alignItems:'center',
-                           justifyContent: 'space-between'}}>
+            <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
                 <Text>Usuário: {usuario.nome}</Text>
-                <button title='Sair' onPress={botaoLogout} style={Estilos.botao1}>Sair</button>
+                <Button title='Sair' onPress={botaoLogout}/>
             </View>
-            <Text>Principal</Text>
+            <Text style={{color: "#ff4b9f", fontSize: 50, fontFamily: "Arial", justifyContent: 'center', display: 'flex'}}>Principal</Text>
         </View>
-        
+       
     )
 }
-

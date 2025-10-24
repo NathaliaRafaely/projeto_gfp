@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { UsuarioContext } from '../UsuarioContext';
-import { enderecoServidor } from '../utils';
+import { UsuarioContext } from '../UsuarioContext'
+import { enderecoServidor } from '../utils'
 import { MdCreditCard, MdSave, MdClose } from 'react-icons/md';
-import Estilos from '../styles/Estilos';
+import { useNavigate, useLocation } from 'react-router-dom'
+import Estilos from '../styles/Estilos'
 
 export default function SubCategoriasModal({ modalAberto, fecharModal, itemAlterar, categoriaPai }) {
     const { dadosUsuario } = useContext(UsuarioContext);
@@ -17,39 +18,28 @@ export default function SubCategoriasModal({ modalAberto, fecharModal, itemAlter
         }
     }, [itemAlterar, modalAberto]);
 
-    if (!modalAberto) return null;
+    if (modalAberto == false) {
+        return null
+    }
 
     const botaoSalvar = async () => {
-        if (nome.trim() === '') {
-            alert('Informe o nome da subcategoria');
-            return;
+        if (nome.trim() == '') {
+            alert('Informe o nome da subcategoria')
+            return
         }
-
-        if (!categoriaPai) {
-            alert('Categoria pai não informada!');
-            return;
-        }
-
         const dados = {
-            nome,
-            id_categoria: categoriaPai?.id_categoria ?? categoriaPai, // garante o ID mesmo se for objeto
+            nome: nome,
+            id_categoria: categoriaPai,
             ativo: true
-        };
-
-
-        // const dados = {
-        //     nome,
-        //     id_categoria: categoriaPai,
-        //     ativo: true
-        // };
+        }
 
         try {
-            let endpoint = `${enderecoServidor}/subcategorias`;
-            let metodo = 'POST';
+            let endpoint = `${enderecoServidor}/subcategorias`
+            let metodo = 'POST'
 
             if (itemAlterar) {
-                endpoint = `${enderecoServidor}/subcategorias/${itemAlterar.id_subcategoria}`;
-                metodo = 'PUT';
+                endpoint = `${enderecoServidor}/subcategorias/${itemAlterar.id_subcategoria}`
+                metodo = 'PUT'
             }
 
             const resposta = await fetch(endpoint, {
@@ -59,47 +49,41 @@ export default function SubCategoriasModal({ modalAberto, fecharModal, itemAlter
                     'Authorization': `Bearer ${dadosUsuario.token}`
                 },
                 body: JSON.stringify(dados)
-            });
+            })
 
-            const resultado = await resposta.json();
-
-            if (!resposta.ok) {
-                throw new Error(resultado.message || 'Erro ao salvar subcategoria');
+            if (resposta.ok) {
+                alert('Subcategoria gravada com sucesso!')
+                fecharModal()
             }
 
-            alert('Subcategoria gravada com sucesso!');
-            fecharModal(true); // passa true para o pai recarregar a lista
         } catch (error) {
-            alert('Erro ao salvar subcategoria: ' + error.message);
+            alert('Erro ao salvar subcategoria: ' + error.message)
             console.error('Erro ao salvar subcategoria:', error);
         }
-    };
+    }
 
     return (
         <div className='fixed inset-0 bg-black/80 py-6 px-4 flex justify-center items-center z-50'>
             <section className='w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg text-gray-800'>
                 {/* Cabeçalho */}
-                <header className='flex items-center gap-2 mb-6 border-b border-gray-200 pb-4'>
+                <header className='flex itens-center gap-2 mb-6 border-b border-gray-200 pb-4'>
                     <MdCreditCard className='text-cyan-600 h-8 w-8' />
                     <h2 className='text-2xl font-bold'>
-                        {itemAlterar ? 'Editar SubCategoria' : 'Nova SubCategoria'}
+                        {itemAlterar ? 'Editar Subcategoria' : 'Nova Subcategoria'}
                     </h2>
                 </header>
 
-                {/* Formulário */}
+                {/* Formulário de cadastro */}
                 <div className='space-y-5'>
-                    <label className={Estilos.labelCadastro}>Nome da SubCategoria</label>
-                    <input
-                        type="text"
-                        value={nome}
+                    <label className={Estilos.labelCadastro} >Nome da Subcategoria</label>
+                    <input type="text" value={nome}
                         onChange={(e) => setNome(e.target.value)}
-                        placeholder='Ex.: Lavagem, Oficina, Seguro...'
-                        className={Estilos.inputCadastro}
-                    />
-
-                    {/* Botões */}
+                        placeholder='Ex.: Supermercado, escola, etc.'
+                        className={Estilos.inputCadastro} />
+                    
+                    {/* Botões de controle */}
                     <div className='flex justify-end gap-3 mt-8'>
-                        <button className={Estilos.botaoOutline} onClick={() => fecharModal(false)}>
+                        <button className={Estilos.botaoOutline} onClick={() => fecharModal()}>
                             <MdClose /> Cancelar
                         </button>
                         <button className={Estilos.botao} onClick={botaoSalvar}>
@@ -107,7 +91,9 @@ export default function SubCategoriasModal({ modalAberto, fecharModal, itemAlter
                         </button>
                     </div>
                 </div>
+
             </section>
         </div>
-    );
+    )
+
 }

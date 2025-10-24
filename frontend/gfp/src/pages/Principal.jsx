@@ -16,10 +16,10 @@ import Transacoes from './Transacoes';
 export default function Principal() {
     const { dadosUsuario, setDadosUsuario, carregando } = useContext(UsuarioContext);
 
-    const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
     const [menuAberto, setMenuAberto] = useState(false);
-
-    const fecharTransacaoModal = () =>{
+    const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
+    
+    const fecharTransacaoModal = () => {
         setModalTransacaoAberto(false);
     }
 
@@ -49,14 +49,14 @@ export default function Principal() {
                 ${menuAberto == true ? 'block' : 'hidden'}     `}
                 onClick={() => setMenuAberto(false)}>                
             </div>
-           
+            
             {/* Sidebar */}
-            <section className={`fixed top-0 left-0 h-full w-64 bg-slate-900
+            <section className={`fixed top-0 left-0 h-full w-64 bg-slate-900 
                 text-gray-200 flex flex-col z-40 transform transition-transform
-                md:relative md:w-20 lg:w-64 md:translate-x-0
+                md:relative md:w-20 lg:w-64 md:translate-x-0 
                 ${menuAberto == true ? 'translate-x-0' : '-translate-x-full'}
                 `}>
-                <div className='flex justify-between items-center mb-6 p-4
+                <div className='flex justify-between items-center mb-6 p-4 
                                     border-b border-slate-700'>
                     <div className='flex gap-2 items-center'>
                         <img src={logo} alt='Logo GFP' className='w-8 h-8' />
@@ -164,9 +164,8 @@ export default function Principal() {
                 </main>
 
             </section>
-               <TransacaoModal modalAberto={modalTransacaoAberto} fecharModal={fecharTransacaoModal} />                
 
+            <TransacaoModal modalAberto={modalTransacaoAberto} fecharModal={fecharTransacaoModal} />
         </div>
     );
 }
-

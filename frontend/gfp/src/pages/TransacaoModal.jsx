@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { UsuarioContext } from '../UsuarioContext'
-import { enderecoServidor, iconesCategoria, listaCores, listaIcones } from '../utils'
+import { enderecoServidor } from '../utils'
 import { MdCreditCard, MdSave, MdClose } from 'react-icons/md';
 import Estilos from '../styles/Estilos'
 
@@ -99,55 +99,50 @@ export default function TransacaoModal({ modalAberto, fecharModal, itemAlterar }
     }
 
     const botaoSalvar = async () => {
-  if (descricao.trim() === '' || !valor || !dataVencimento) {
-    alert('Por favor, preencha os campos obrigatórios.');
-    return;
-  }
+        if (descricao.trim() == '' || !valor || !dataVencimento) {
+            alert('Por favor, preencha os campos obrigatórios.')
+            return
+        }
+        const dados = {
+            descricao: descricao,
+            valor: parseFloat(valor),
+            data_vencimento: dataVencimento,
+            data_pagamento: dataPagamento,
+            tipo: tipo,
+            id_conta: parseInt(idConta),
+            id_categoria: parseInt(idCategoria),
+            id_subcategoria: parseInt(idSubcategoria),
+            id_usuario: parseInt(dadosUsuario.id_usuario)
+        }
 
-  const dados = {
-    descricao: descricao,
-    valor: parseFloat(valor),
-    data_vencimento: dataVencimento,
-    data_pagamento: dataPagamento || null, // evita null quebrado no input
-    tipo_transacao: tipo,
-    id_conta: idConta ? parseInt(idConta) : null,
-    id_categoria: idCategoria ? parseInt(idCategoria) : null,
-    id_subcategoria: idSubcategoria ? parseInt(idSubcategoria) : null,
-    id_usuario: parseInt(dadosUsuario.id_usuario)
-  };
+        try {
+            let endpoint = `${enderecoServidor}/transacoes`
+            let metodo = 'POST'
 
-  try {
-    let endpoint = `${enderecoServidor}/transacoes`;
-    let metodo = 'POST';
-
-    if (itemAlterar) {
-      endpoint = `${enderecoServidor}/transacoes/${itemAlterar.id_transacao}`;
-      metodo = 'PUT';
-    }
+            if (itemAlterar) {
+                endpoint = `${enderecoServidor}/transacoes/${itemAlterar.id_transacao}`
+                metodo = 'PUT'
+            }
 
             const resposta = await fetch(endpoint, {
-      method: metodo,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${dadosUsuario.token}`
-      },
-      body: JSON.stringify(dados)
-    });
+                method: metodo,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${dadosUsuario.token}`
+                },
+                body: JSON.stringify(dados)
+            })
 
-    if (resposta.ok) {
-      alert('Transação gravada com sucesso!');
-      fecharModal();
-    } else {
-      const erro = await resposta.json();
-      alert(`Erro ao salvar transação: ${erro.mensagem || resposta.statusText}`);
-      console.error("Erro detalhado:", erro);
+            if (resposta.ok) {
+                alert('Transação gravada com sucesso!')
+                fecharModal()
+            }
+
+        } catch (error) {
+            alert('Erro ao salvar categoria: ' + error.message)
+            console.error('Erro ao salvar categoria:', error);
+        }
     }
-
-  } catch (error) {
-    alert('Erro inesperado ao salvar transação: ' + error.message);
-    console.error('Erro inesperado:', error);
-  }
-};
 
     return (
         <div className='fixed inset-0 bg-black/80 py-6 px-4 flex justify-center items-center z-50'>
@@ -163,7 +158,6 @@ export default function TransacaoModal({ modalAberto, fecharModal, itemAlterar }
                 {/* Formulário de cadastro */}
                 <div className='space-y-5'>
                     <div className='flex rounded-md shadow-sm'>
-
                         <button type='button' onClick={() => setTipo('ENTRADA')}
                             className={`flex-1 p-2 rounded-l-md 
                             ${tipo == 'ENTRADA' ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>ENTRADA</button>
@@ -171,7 +165,6 @@ export default function TransacaoModal({ modalAberto, fecharModal, itemAlterar }
                         <button type='button' onClick={() => setTipo('SAIDA')}
                             className={`flex-1 p-2 rounded-r-md 
                             ${tipo == 'SAIDA' ? 'bg-red-500 text-white' : 'bg-gray-200'}`}>SAÍDA</button>
-
                     </div>
 
                     <div className='flex items-center gap-3 '>
@@ -256,9 +249,7 @@ export default function TransacaoModal({ modalAberto, fecharModal, itemAlterar }
                         </button>
                     </div>
                 </div>
-
             </section>
         </div>
     )
-
 }

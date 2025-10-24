@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UsuarioContext } from '../UsuarioContext'
-import { enderecoServidor, nomesTipoConta, iconesTipoConta} from '../utils'
-import { MdAdd, MdEdit, MdDelete, MdCreditCard,MdAccountBalance, MdMail, MdFeaturedPlayList, MdAttachMoney, MdAutoGraph } from 'react-icons/md';
+import { enderecoServidor, nomesTipoConta, iconesTipoConta } from '../utils'
+import { MdAdd, MdEdit, MdDelete, MdCreditCard, MdAccountBalance, MdEmail, MdFeaturedPlayList, MdAttachMoney, MdAutoGraph } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
 import Estilos from '../styles/Estilos'
 
@@ -44,9 +44,7 @@ export default function Contas() {
                 }
             });
 
-            if (resposta.ok) {
-                buscarDadosAPI();
-            }
+            if (resposta.ok) buscarDadosAPI();
 
         } catch (error) {
             console.error('Erro ao excluir:', error);
@@ -55,20 +53,18 @@ export default function Contas() {
 
     const exibirItemLista = (item) => {
         return (
-            <div key={item.id} className={Estilos.linhaListagem}>
+            <div key={item.id_conta} className={Estilos.linhaListagem}>
                 <div className='p-2 bg-cyan-100 text-cyan-600 rounded-full'>
-                    { iconesTipoConta[ item.tipo_conta]}
-                    {/* <MdCreditCard className='w-6 h-6' /> */}
+                    { iconesTipoConta[item.tipo_conta] }
                 </div>
                 <div className='flex-1 ml-4'>
                     <p className='font-bold text-gray-800'>{item.nome}</p>
-                    <p className='text-sm text-gray-500'>{nomesTipoConta[item.tipo_conta]}</p>
+                    <p className='text-sm text-gray-500'>{ nomesTipoConta[item.tipo_conta] }</p>
                 </div>
                 <div className='flex items-center space-x-2'>
-                    <button className={Estilos.botaoAlterar} onClick={() => navigate('/cadcontas',{ state :{ itemAlterar: item}})}> <MdEdit className='h-6 w-6' /></button>
+                    <button className={Estilos.botaoAlterar} onClick={() => navigate('/cadcontas', { state: { itemAlterar: item } } )}> <MdEdit className='h-6 w-6' /></button>
                     <button className={Estilos.botaoExcluir} onClick={() => botaoExcluir(item.id_conta)} > <MdDelete className='h-6 w-6' /></button>
                 </div>
-
             </div>
         )
     }
@@ -88,10 +84,7 @@ export default function Contas() {
                 <section>
                     {dadosLista.map(item => exibirItemLista(item))}
                 </section>
-
             </section>
-
-
         </div>
     )
 }
